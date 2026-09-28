@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="GLS Access Lab: a local educational object authorization lab.">
+  <title>GLS Access Lab · Object Authorization Console</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="GLS Access Lab home">
+      <span class="brand-mark">GLS</span>
+      <span class="brand-copy"><strong>GLS Access Lab</strong><small>GLS University Institute of Technology</small></span>
+    </a>
+    <div class="header-meta"><span class="local-dot"></span><span>Unofficial portfolio demo · Local lab</span><code>127.0.0.1:8103</code></div>
+  </header>
+
+  <main class="shell">
+    <section class="briefing" aria-labelledby="page-title">
+      <div class="brief-copy">
+        <p class="kicker">SECURITY_CONSOLE / BOLA_SIMULATION</p>
+        <h1 id="page-title">Object-level access control, inspected live.</h1>
+        <p>Send one note ID through two authenticated API paths. The vulnerable query trusts the identifier; the secure query also binds it to the session owner.</p>
+      </div>
+      <div class="telemetry" aria-label="Lab status">
+        <div><span>SCOPE</span><strong>LOOPBACK ONLY</strong></div>
+        <div><span>DATA</span><strong>FICTIONAL</strong></div>
+        <div><span>CONTROL</span><strong>CWE-639</strong></div>
+      </div>
+    </section>
+
+    <section class="workspace" aria-labelledby="workspace-title">
+      <div class="console-bar">
+        <div><span class="window-dot red"></span><span class="window-dot amber"></span><span class="window-dot green"></span></div>
+        <p id="workspace-title">access-control-comparator</p>
+        <div id="sessionBadge" class="session-badge is-signed-out">SESSION: NONE</div>
+      </div>
+
+      <div id="loginPanel" class="login-card">
+        <div class="login-copy">
+          <span class="step-code">01 / AUTHENTICATE</span>
+          <h2>Select a test identity</h2>
+          <p>Both profiles and their private notes are synthetic GLS University Institute of Technology demo fixtures.</p>
+        </div>
+        <div class="account-actions">
+          <button class="account-button" data-user="aarav" data-password="aarav-demo">
+            <span class="avatar aarav">AS</span><span><strong>Aarav Shah</strong><small>aarav / aarav-demo</small></span><span class="keycap">ENTER</span>
+          </button>
+          <button class="account-button" data-user="meera" data-password="meera-demo">
+            <span class="avatar meera">MP</span><span><strong>Meera Patel</strong><small>meera / meera-demo</small></span><span class="keycap">ENTER</span>
+          </button>
+        </div>
+        <p id="loginError" class="error" role="alert"></p>
+      </div>
+
+      <div id="demoPanel" class="demo-panel hidden">
+        <div class="request-builder">
+          <div class="request-field">
+            <label for="noteId"><span>02 / TARGET</span> Object ID</label>
+            <div class="input-row"><span>GET /notes/</span><input id="noteId" type="number" min="1" inputmode="numeric" value="3"><button id="compareButton">RUN COMPARISON</button></div>
+            <p class="hint">Fixture map: Aarav owns 1–2 · Meera owns 3–4</p>
+          </div>
+          <div class="control-actions">
+            <button id="ownButton" class="secondary">MY_NOTE</button>
+            <button id="otherButton" class="secondary">OTHER_USER_NOTE</button>
+            <button id="unauthButton" class="text-button">NO_SESSION</button>
+            <button id="logoutButton" class="text-button danger">LOG_OUT</button>
+          </div>
+        </div>
+
+        <div class="comparison" aria-live="polite">
+          <article class="result-card vulnerable">
+            <div class="terminal-title"><span>REQUEST_A // VULNERABLE</span><span id="vulnerableStatus" class="http-status idle">READY</span></div>
+            <div class="request-line"><span>GET</span> /api/vulnerable/notes/:id</div>
+            <div class="query-block"><i>$</i> SELECT note <span>WHERE</span> notes.id = ?</div>
+            <div class="response-label">RESPONSE PAYLOAD</div>
+            <div id="vulnerableResult" class="result-body"><p>Awaiting request…</p></div>
+          </article>
+          <div class="versus"><span>DIFF</span></div>
+          <article class="result-card secure">
+            <div class="terminal-title"><span>REQUEST_B // FIXED</span><span id="secureStatus" class="http-status idle">READY</span></div>
+            <div class="request-line"><span>GET</span> /api/secure/notes/:id</div>
+            <div class="query-block"><i>$</i> SELECT note <span>WHERE</span> notes.id = ? <b>AND</b> owner_id = session.user_id</div>
+            <div class="response-label">RESPONSE PAYLOAD</div>
+            <div id="secureResult" class="result-body"><p>Awaiting request…</p></div>
+          </article>
+        </div>
+
+        <div id="finding" class="finding hidden"></div>
+        <section class="my-notes">
+          <div class="section-label"><span>SESSION OBJECTS</span><h2>Authorized note inventory</h2></div>
+          <div id="noteList" class="note-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="guardrails" aria-label="Security controls">
+      <article><span>CONTROL_01</span><h3>Identity from session</h3><p>The server maps an opaque HttpOnly cookie to a user. Client-supplied user IDs are ignored.</p></article>
+      <article><span>CONTROL_02</span><h3>Owner-scoped query</h3><p>The fixed lookup constrains object ID and session owner in the same parameterized query.</p></article>
+      <article><span>CONTROL_03</span><h3>Concealed denial</h3><p>Missing and unauthorized secure objects both return 404, disclosing no ownership detail.</p></article>
+    </section>
+  </main>
+
+  <footer><span>GLS UNIVERSITY INSTITUTE OF TECHNOLOGY · UNOFFICIAL STUDENT PORTFOLIO DEMO</span><a href="https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization/" target="_blank" rel="noreferrer">OWASP API1:2023 ↗</a></footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>
